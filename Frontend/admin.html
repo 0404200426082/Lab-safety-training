@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Lab Safety Induction Tracker</title>
+    <!-- React Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/react-icons/4.11.0/ri.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            color: #333;
+            overflow: hidden; /* Prevent body scrolling */
+        }
+
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 30px; /* Added top padding for fixed header */
+            height: calc(100vh - 70px); /* Full height minus header */
+            overflow-y: auto; /* Allow scrolling only in container */
+        }
+
+        .navbar {
+            background: #3498db;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .navbar p {
+            margin-top: 5px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            color: #333;
+            border: 2px solid #3498db;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #ecf0f1;
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table thead {
+            background: #3498db;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .badge-info {
+            background: #e3f2fd;
+            color: #0277bd;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        .alert {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1976d2;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            color: #0277bd;
+            border-left: 4px solid #03a9f4;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .module-completion {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .module-completion h4 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Simple Report Styles */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-modal.active {
+            display: flex;
+        }
+
+        .report-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .report-header {
+            background: #3498db;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+
+        .report-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .report-body {
+            padding: 25px;
+        }
+
+        .report-section {
+            margin-bottom: 20px;
+        }
+
+        .report-section h3 {
+            color: #3498db;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .report-item:last-child {
+            border-bottom: none;
+        }
+
+        .report-actions {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            table th, table td {
+                padding: 8px 10px;
+            }
+
+            .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="ri-flask-line"></i> Lab Safety Induction Tracker</h1>
+        <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <span><strong>Administrator</strong></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="navbar">
+            <h2>Administrative Dashboard</h2>
+            <p>Monitor and verify student safety training completions</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-group-line"></i></div>
+                <div class="stat-info">
+                    <h3 id="totalStudents">0</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-checkbox-circle-line"></i></div>
+                <div class="stat-info">
+                    <h3 id="completedTraining">0</h3>
+                    <p>Completed Training</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-door-line"></i></div>
+                <div class="stat-info">
+                    <h3 id="labAccessGranted">0</h3>
+                    <p>Lab Access Verified</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="alertContainer"></div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('roster')">
+                <i class="ri-user-line"></i> Student Roster
+            </button>
+            <button class="tab-btn" onclick="switchTab('completions')">
+                <i class="ri-file-list-line"></i> Completion Records
+            </button>
+            <button class="tab-btn" onclick="switchTab('access')">
+                <i class="ri-login-box-line"></i> Lab Access Log
+            </button>
+            <button class="tab-btn" onclick="switchTab('reports')">
+                <i class="ri-bar-chart-line"></i> Reports
+            </button>
+        </div>
+
+        <!-- Student Roster Tab -->
+        <div class="card" id="rosterTab">
+            <h2><i class="ri-user-line"></i> Student Roster</h2>
+            <div class="search-box">
+                <i class="ri-search-line search-icon"></i>
+                <input type="text" id="rosterSearch" placeholder="Search by student name or ID..." 
+                       onkeyup="filterTable('rosterTable', this.value)">
+            </div>
+            <div class="table-responsive">
+                <table id="rosterTable">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Modules Completed</th>
+                            <th>Average Score</th>
+                            <th>Lab Access Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rosterTableBody">
+                        <!-- Data loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Completion Records Tab -->
+        <div class="card hidden" id="completionsTab">
+            <h2><i class="ri-file-list-line"></i> Training Completion Records</h2>
+            <div class="search-box">
+                <i class="ri-search-line search-icon"></i>
+                <input type="text" id="completionsSearch" placeholder="Search completion records..." 
+                       onkeyup="filterTable('completionsTable', this.value)">
+            </div>
+            <div class="table-responsive">
+                <table id="completionsTable">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Module</th>
+                            <th>Score</th>
+                            <th>Completion Date</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="completionsTableBody">
+                        <!-- Data loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Lab Access Log Tab -->
+        <div class="card hidden" id="accessTab">
+            <h2><i class="ri-login-box-line"></i> Lab Access Log</h2>
+            <div class="search-box">
+                <i class="ri-search-line search-icon"></i>
+                <input type="text" id="accessSearch" placeholder="Search access log..." 
+                       onkeyup="filterTable('accessTable', this.value)">
+            </div>
+            <div class="table-responsive">
+                <table id="accessTable">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Access Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accessTableBody">
+                        <!-- Data loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div class="card hidden" id="reportsTab">
+            <h2><i class="ri-bar-chart-line"></i> Training Analytics & Reports</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="module-completion">
+                    <h3 style="color: #333; margin-bottom: 20px;">Module Completion Rates</h3>
+                    <div id="moduleCompletionChart">
+                        <div style="margin-bottom: 20px;">
+                            <h4>
+                                <span>Computer & OS Basic Knowledge</span>
+                                <span id="module1Rate" style="color: #3498db;">0%</span>
+                            </h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="module1Progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4>
+                                <span>Cybersecurity Concepts</span>
+                                <span id="module2Rate" style="color: #3498db;">0%</span>
+                            </h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="module2Progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <h4>
+                                <span>Document Structure Elements</span>
+                                <span id="module3Rate" style="color: #3498db;">0%</span>
+                            </h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="module3Progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="module-completion" style="text-align: center;">
+                    <h3 style="color: #333; margin-bottom: 20px;">Lab Access Summary</h3>
+                    <div style="font-size: 56px; color: #3498db; margin: 30px 0; font-weight: bold;" id="labAccessCount">0</div>
+                    <div style="font-size: 18px; color: #666; margin-bottom: 20px;">Students with Verified Lab Access</div>
+                    <div style="font-size: 14px; color: #666; padding: 15px; background: white; border-radius: 8px;" id="labAccessPending">
+                        0 students awaiting verification
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="generateReport()" style="padding: 12px 30px; font-size: 14px;">
+                    <i class="ri-download-line"></i> Generate Detailed Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Report Modal -->
+    <div class="report-modal" id="reportModal">
+        <div class="report-content">
+            <div class="report-header">
+                <button class="close-btn" onclick="closeReport()">&times;</button>
+                <h2>Training System Report</h2>
+            </div>
+            <div class="report-body" id="reportBody">
+                <!-- Report content will be generated here -->
+            </div>
+            <div class="report-actions">
+                <button class="btn btn-primary" onclick="closeReport()">
+                    <i class="ri-close-line"></i> Close Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structures
+        let students = [];
+        let completionRecords = [];
+        let labAccessLog = [];
+
+        // Safety modules configuration
+        const safetyModules = [
+            { id: 'module1', name: 'Computer & OS Basic Knowledge' },
+            { id: 'module2', name: 'Cybersecurity Concepts' },
+            { id: 'module3', name: 'Document Structure Elements' }
+        ];
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAllViews();
+        });
+
+        // Add completion record
+        function addCompletion(studentId, moduleId, score, date, duration) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            const completion = {
+                moduleId: moduleId,
+                score: score,
+                date: date,
+                duration: duration,
+                verified: score >= 70
+            };
+
+            student.completions.push(completion);
+
+            completionRecords.push({
+                studentId: studentId,
+                studentName: student.name,
+                ...completion
+            });
+
+            // Auto-grant lab access if all modules completed with passing scores
+            if (student.completions.length === safetyModules.length) {
+                const allPassed = student.completions.every(c => c.score >= 70);
+                if (allPassed && !labAccessLog.some(log => log.studentId === studentId)) {
+                    // System automatically grants access - admin just needs to verify physical access
+                    showAlert('System: ' + student.name + ' has completed all safety training. Ready for lab access verification.', 'info');
+                }
+            }
+            
+            updateAllViews();
+        }
+
+        // Verify lab access (Admin's ONLY function)
+        function verifyLabAccess(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            // Check if student completed all training (system auto-check)
+            const allComplete = student.completions.length === safetyModules.length && 
+                               student.completions.every(c => c.score >= 70);
+            
+            if (!allComplete) {
+                showAlert(student.name + ' has not completed all safety training modules', 'error');
+                return;
+            }
+
+            // Check if already verified
+            if (labAccessLog.some(log => log.studentId === studentId)) {
+                showAlert('Lab access already verified for ' + student.name, 'info');
+                return;
+            }
+
+            // Record physical verification by admin
+            labAccessLog.push({
+                studentId: studentId,
+                studentName: student.name,
+                accessDate: new Date().toISOString().split('T')[0]
+            });
+
+            showAlert('Lab access verified for ' + student.name, 'success');
+            updateAllViews();
+        }
+
+        // Remove lab access verification
+        function removeAccessVerification(studentId) {
+            const index = labAccessLog.findIndex(log => log.studentId === studentId);
+            if (index !== -1) {
+                const studentName = labAccessLog[index].studentName;
+                labAccessLog.splice(index, 1);
+                showAlert('Lab access verification removed for ' + studentName, 'error');
+                updateAllViews();
+            }
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.card').forEach(card => card.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+        }
+
+        // Update all views
+        function updateAllViews() {
+            updateStatistics();
+            loadRosterData();
+            loadCompletionsData();
+            loadAccessLogData();
+            updateReports();
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            document.getElementById('totalStudents').textContent = students.length;
+            
+            const completedTraining = students.filter(s => 
+                s.completions.length === safetyModules.length && 
+                s.completions.every(c => c.score >= 70)
+            ).length;
+            document.getElementById('completedTraining').textContent = completedTraining;
+            
+            const verifiedAccess = labAccessLog.length;
+            document.getElementById('labAccessGranted').textContent = verifiedAccess;
+        }
+
+        // Load roster data
+        function loadRosterData() {
+            const tbody = document.getElementById('rosterTableBody');
+            
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div><i class="ri-group-line"></i></div>
+                            <h3>No Students Registered</h3>
+                            <p>Student data will appear here once they register for safety training</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = students.map(student => {
+                const completedCount = student.completions.length;
+                const totalModules = safetyModules.length;
+                
+                let avgScore = 0;
+                if (completedCount > 0) {
+                    avgScore = Math.round(student.completions.reduce((sum, c) => sum + c.score, 0) / completedCount);
+                }
+                
+                const hasVerifiedAccess = labAccessLog.some(log => log.studentId === student.id);
+                const allComplete = completedCount === totalModules && student.completions.every(c => c.score >= 70);
+
+                return `
+                    <tr>
+                        <td><strong>${student.id}</strong></td>
+                        <td>${student.name}</td>
+                        <td>${completedCount}/${totalModules}</td>
+                        <td>
+                            ${completedCount > 0 ? 
+                                '<span class="badge ' + getScoreBadge(avgScore) + '">' + avgScore + '%</span>' : 
+                                '<span class="badge badge-info">N/A</span>'
+                            }
+                        </td>
+                        <td>
+                            <span class="badge ${hasVerifiedAccess ? 'badge-success' : allComplete ? 'badge-warning' : 'badge-info'}">
+                                ${hasVerifiedAccess ? 
+                                    '<i class="ri-check-line"></i> Access Verified' : 
+                                    allComplete ? 
+                                    '<i class="ri-time-line"></i> Ready for Verification' : 
+                                    '<i class="ri-book-line"></i> Training Incomplete'
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewStudentDetails('${student.id}')">
+                                <i class="ri-eye-line"></i> Details
+                            </button>
+                            ${allComplete && !hasVerifiedAccess ? 
+                                '<button class="btn btn-success" onclick="verifyLabAccess(\'' + student.id + '\')">' +
+                                '<i class="ri-check-line"></i> Verify Access</button>' : 
+                                hasVerifiedAccess ?
+                                '<button class="btn btn-danger" onclick="removeAccessVerification(\'' + student.id + '\')">' +
+                                '<i class="ri-close-line"></i> Remove</button>' : ''
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load completions data
+        function loadCompletionsData() {
+            const tbody = document.getElementById('completionsTableBody');
+            
+            if (completionRecords.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div><i class="ri-file-list-line"></i></div>
+                            <h3>No Completion Records</h3>
+                            <p>Training completion records will appear here</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = completionRecords.map(record => {
+                const module = safetyModules.find(m => m.id === record.moduleId);
+                
+                return `
+                    <tr>
+                        <td>
+                            <strong>${record.studentName}</strong><br>
+                            <small style="color: #7f8c8d;">${record.studentId}</small>
+                        </td>
+                        <td>${module ? module.name : record.moduleId}</td>
+                        <td><span class="badge ${getScoreBadge(record.score)}">${record.score}%</span></td>
+                        <td>${record.date}</td>
+                        <td>${record.duration}</td>
+                        <td>
+                            <span class="badge ${record.verified ? 'badge-success' : 'badge-danger'}">
+                                ${record.verified ? '<i class="ri-check-line"></i> Passed' : '<i class="ri-close-line"></i> Failed'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" onclick="viewModuleCertificate('${record.studentId}', '${record.moduleId}')">
+                                <i class="ri-award-line"></i> Certificate
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load access log data
+        function loadAccessLogData() {
+            const tbody = document.getElementById('accessTableBody');
+            
+            if (labAccessLog.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            <div><i class="ri-login-box-line"></i></div>
+                            <h3>No Access Log Entries</h3>
+                            <p>Lab access verification records will appear here</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = labAccessLog.map(log => {
+                return `
+                    <tr>
+                        <td><strong>${log.studentId}</strong></td>
+                        <td>${log.studentName}</td>
+                        <td>${log.accessDate}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="removeAccessVerification('${log.studentId}')">
+                                <i class="ri-close-line"></i> Remove
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update reports
+        function updateReports() {
+            safetyModules.forEach((module, index) => {
+                const completedCount = students.filter(s => 
+                    s.completions.some(c => c.moduleId === module.id && c.score >= 70)
+                ).length;
+                
+                const rate = students.length > 0 ? Math.round((completedCount / students.length) * 100) : 0;
+                
+                document.getElementById('module' + (index+1) + 'Rate').textContent = rate + '%';
+                document.getElementById('module' + (index+1) + 'Progress').style.width = rate + '%';
+            });
+            
+            const verifiedAccess = labAccessLog.length;
+            document.getElementById('labAccessCount').textContent = verifiedAccess;
+            
+            const readyForVerification = students.filter(s => {
+                const hasVerifiedAccess = labAccessLog.some(log => log.studentId === s.id);
+                const allComplete = s.completions.length === safetyModules.length && 
+                                  s.completions.every(c => c.score >= 70);
+                return allComplete && !hasVerifiedAccess;
+            }).length;
+            
+            document.getElementById('labAccessPending').textContent = 
+                readyForVerification + " student" + (readyForVerification !== 1 ? "s" : "") + " ready for verification";
+        }
+
+        // Get score badge class
+        function getScoreBadge(score) {
+            if (score >= 80) return 'badge-success';
+            if (score >= 70) return 'badge-warning';
+            return 'badge-danger';
+        }
+
+        // Filter table based on search
+        function filterTable(tableId, searchTerm) {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm.toLowerCase()) ? '' : 'none';
+            }
+        }
+
+        // View student details
+        function viewStudentDetails(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+
+            const hasVerifiedAccess = labAccessLog.some(log => log.studentId === student.id);
+            
+            let details = 'STUDENT DETAILS\n\n';
+            details += 'ID: ' + student.id + '\n';
+            details += 'Name: ' + student.name + '\n';
+            details += 'Lab Access: ' + (hasVerifiedAccess ? 'VERIFIED ✓' : 'NOT VERIFIED') + '\n\n';
+            details += 'TRAINING PROGRESS\n';
+            details += 'Modules Completed: ' + student.completions.length + '/' + safetyModules.length + '\n\n';
+            
+            if (student.completions.length > 0) {
+                details += 'MODULE DETAILS:\n';
+                student.completions.forEach(comp => {
+                    const module = safetyModules.find(m => m.id === comp.moduleId);
+                    details += '\n• ' + (module ? module.name : comp.moduleId) + '\n';
+                    details += '  Score: ' + comp.score + '%\n';
+                    details += '  Date: ' + comp.date + '\n';
+                    details += '  Duration: ' + comp.duration + '\n';
+                    details += '  Status: ' + (comp.verified ? 'PASSED ✓' : 'FAILED ✗') + '\n';
+                });
+            } else {
+                details += '\nNo training modules completed yet.';
+            }
+            
+            alert(details);
+        }
+
+        // View module certificate
+        function viewModuleCertificate(studentId, moduleId) {
+            const student = students.find(s => s.id === studentId);
+            const module = safetyModules.find(m => m.id === moduleId);
+            const completion = student.completions.find(c => c.moduleId === moduleId);
+            
+            if (!student || !module || !completion) return;
+            
+            const certData = `
+CERTIFICATE OF COMPLETION
+
+This certifies that
+
+${student.name}
+Student ID: ${student.id}
+
+has successfully completed the safety training module:
+
+${module.name}
+
+Score: ${completion.score}%
+Date: ${completion.date}
+Duration: ${completion.duration}
+
+Status: ${completion.verified ? 'PASSED' : 'FAILED'}
+
+Lab Safety Induction Tracker System
+            `;
+            
+            alert(certData);
+        }
+
+        // Generate simple report
+        function generateReport() {
+            const totalStudents = students.length;
+            const completedTraining = students.filter(s => 
+                s.completions.length === safetyModules.length && 
+                s.completions.every(c => c.score >= 70)
+            ).length;
+            const verifiedAccess = labAccessLog.length;
+            
+            let totalScore = 0;
+            let scoreCount = 0;
+            students.forEach(student => {
+                student.completions.forEach(comp => {
+                    totalScore += comp.score;
+                    scoreCount++;
+                });
+            });
+            const avgScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
+
+            // Generate simple report content
+            const reportBody = document.getElementById('reportBody');
+            reportBody.innerHTML = `
+                <div class="report-section">
+                    <h3>System Summary</h3>
+                    <div class="report-item">
+                        <span>Total Students:</span>
+                        <strong>${totalStudents}</strong>
+                    </div>
+                    <div class="report-item">
+                        <span>Completed Training:</span>
+                        <strong>${completedTraining}</strong>
+                    </div>
+                    <div class="report-item">
+                        <span>Verified Lab Access:</span>
+                        <strong>${verifiedAccess}</strong>
+                    </div>
+                    <div class="report-item">
+                        <span>Average Score:</span>
+                        <strong>${avgScore}%</strong>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>Module Completion</h3>
+                    ${safetyModules.map(module => {
+                        const completed = students.filter(s => 
+                            s.completions.some(c => c.moduleId === module.id && c.score >= 70)
+                        ).length;
+                        const rate = totalStudents > 0 ? Math.round((completed / totalStudents) * 100) : 0;
+                        return `
+                            <div class="report-item">
+                                <span>${module.name}:</span>
+                                <span>${rate}% (${completed}/${totalStudents})</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div class="report-section">
+                    <h3>Access Status</h3>
+                    <div class="report-item">
+                        <span>Verified Access:</span>
+                        <strong>${verifiedAccess}</strong>
+                    </div>
+                    <div class="report-item">
+                        <span>Ready for Verification:</span>
+                        <strong>${students.filter(s => {
+                            const hasVerifiedAccess = labAccessLog.some(log => log.studentId === s.id);
+                            const allComplete = s.completions.length === safetyModules.length && 
+                                              s.completions.every(c => c.score >= 70);
+                            return allComplete && !hasVerifiedAccess;
+                        }).length}</strong>
+                    </div>
+                    <div class="report-item">
+                        <span>Training Incomplete:</span>
+                        <strong>${totalStudents - completedTraining}</strong>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <h3>Report Information</h3>
+                    <div class="report-item">
+                        <span>Generated:</span>
+                        <span>${new Date().toLocaleString()}</span>
+                    </div>
+                    <div class="report-item">
+                        <span>System:</span>
+                        <span>Lab Safety Induction Tracker</span>
+                    </div>
+                </div>
+            `;
+            
+            // Show the report modal
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        // Close report modal
+        function closeReport() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-' + (type === 'error' ? 'error' : type === 'info' ? 'info' : 'success');
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
